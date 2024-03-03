@@ -4,6 +4,28 @@ using namespace std;
 
 #define FASTIO ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
 
+void kmp(vector<int>& H, vector<int>& N) {
+	int h = H.size(), n = N.size();
+	int i = 0, j = 0;
+	
+	int diff = H[0] - N[0];
+	while (i <= h - n) {
+		if (j < n && H[i + j] - N[j] == diff) {
+			if (++j == n) {
+				cout << "possible" << endl;
+				return;
+			}
+		}
+		else {
+			i++;
+			j = 0;
+			diff = H[i] - N[0];
+		}
+	}
+
+	cout << "impossible" << endl;
+}
+
 void solve() {
 	int N;
 	cin >> N;
@@ -20,9 +42,7 @@ void solve() {
 
 	sort(clk2.begin(), clk2.end());
 
-	vector<int> f = failure(clk2);
-	vector<int> ans = kmp(clk1, clk2, f);
-	cout << (ans.size() > 1 ? "possible" : "impossible") << endl;
+	kmp(clk1, clk2);
 }
 
 int main() {
