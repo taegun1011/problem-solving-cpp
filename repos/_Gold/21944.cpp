@@ -15,13 +15,19 @@ priority_queue<PII, vector<PII>, less<PII>> rec2_pos, rec2_neg;
 set<PII> rec3_pos, rec3_neg;
 
 //문제의 현재 난이도
-vector<int> diff(100001);
+vector<int> level(100001);
+//문제의 현재 분류
+vector<int> group(100001);
+
+bool is_valid(const PII& p, int x, int g) {
+	return p.first * x == level[p.second * x] && (!g || g == group[p.second * x]);
+}
 
 void rec1(int g, int x) {
-	auto pq = x > 0 ? rec1_pos[g] : rec1_neg[g];
+	auto& pq = x > 0 ? rec1_pos[g] : rec1_neg[g];
 	while (!pq.empty()) {
 		auto cur = pq.top();
-		if (diff[cur.second * x] == cur.first * x) {
+		if (is_valid(cur, x, g)) {
 			cout << cur.second * x << '\n';
 			return;
 		}
@@ -30,10 +36,10 @@ void rec1(int g, int x) {
 }
 
 void rec2(int x) {
-	auto pq = x > 0 ? rec2_pos : rec2_neg;
+	auto& pq = x > 0 ? rec2_pos : rec2_neg;
 	while (!pq.empty()) {
 		auto cur = pq.top();
-		if (diff[cur.second * x] == cur.first * x) {
+		if (is_valid(cur, x, 0)) {
 			cout << cur.second * x << '\n';
 			return;
 		}
@@ -42,7 +48,7 @@ void rec2(int x) {
 }
 
 void rec3(int x, int l) {
-	auto S = x > 0 ? rec3_pos : rec3_neg;
+	auto& S = x > 0 ? rec3_pos : rec3_neg;
 	while (!S.empty()) {
 		//pos에서 찾기 : {l, 0}보다 크거나 같은 pair
 		//neg에서 찾기 : {-l, 0}보다 크거나 같은 pair = 난이도가 -l이여도 번호는 항상 음수이므로 -l + 1에서부터 찾음
@@ -52,7 +58,7 @@ void rec3(int x, int l) {
 			return;
 		}
 		PII cur = *iter;
-		if (diff[cur.second * x] == cur.first * x) {
+		if (is_valid(cur, x, 0)) {
 			cout << cur.second * x << '\n';
 			return;
 		}
@@ -66,7 +72,9 @@ void add() {
 
 	cin >> p >> l >> g;
 
-	diff[p] = l;
+	level[p] = l;
+	group[p] = g;
+
 	rec1_pos[g].push({ l, p });
 	rec2_pos.push({ l, p });
 	rec3_pos.insert({ l, p });
@@ -109,7 +117,7 @@ void solve() {
 			break;
 		case 5:
 			cin >> p;
-			diff[p] = 0;
+			level[p] = group[p] = 0;
 			break;
 		}
 	}

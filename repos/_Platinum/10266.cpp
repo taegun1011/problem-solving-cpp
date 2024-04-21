@@ -3,46 +3,71 @@
 using namespace std;
 
 #define FASTIO ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
+#define SIZE 360000
 
-void kmp(vector<int>& H, vector<int>& N) {
-	int h = H.size(), n = N.size();
-	int i = 0, j = 0;
-	
-	int diff = H[0] - N[0];
-	while (i <= h - n) {
-		if (j < n && H[i + j] - N[j] == diff) {
-			if (++j == n) {
-				cout << "possible" << endl;
-				return;
-			}
+vector<int> fail(vector<char>& S) {
+	int s = S.size();
+	vector<int> pi(s);
+
+	int i = 1, j = 0;
+	while (i + j < s) {
+		if (S[j] == S[i + j]) {
+			pi[i + j] = j + 1;
+			j++;
 		}
 		else {
-			i++;
-			j = 0;
-			diff = H[i] - N[0];
+			if (!j)
+				i++;
+			else {
+				i += j - pi[j - 1];
+				j = pi[j - 1];
+			}
 		}
 	}
 
-	cout << "impossible" << endl;
+	return pi;
+}
+
+bool kmp(vector<char>& H, vector<char>& N, vector<int>& pi) {
+	int h = H.size(), n = N.size();
+
+	int i = 0, j = 0;
+	while (i <= h - n) {
+		if (j < n && H[i + j] == N[j]) {
+			if (++j == n)
+				return true;
+		}
+		else {
+			if (!j)
+				i++;
+			else {
+				i += j - pi[j - 1];
+				j = pi[j - 1];
+			}
+		}
+	}
+
+	return false;
 }
 
 void solve() {
-	int N;
+	vector<char> A(SIZE * 2, 'X'), B(SIZE, 'X');
+
+	int N, x;
 	cin >> N;
-	vector<int> clk1(N), clk2(N);
-	for (int& x : clk1)
+
+	for (int i = 0; i < N; i++) {
 		cin >> x;
-	for (int& x : clk2)
+		
+		A[x] = A[x + SIZE] = 'O';
+	}
+	for (int i = 0; i < N; i++) {
 		cin >> x;
+		B[x] = 'O';
+	}
 
-	sort(clk1.begin(), clk1.end());
-	clk1.resize(N * 2);
-	for (int i = 0; i < N; i++)
-		clk1[N + i] = clk1[i] + 360000;
-
-	sort(clk2.begin(), clk2.end());
-
-	kmp(clk1, clk2);
+	vector<int> pi = fail(B);
+	cout << (kmp(A, B, pi) ? "possible" : "impossible") << endl;
 }
 
 int main() {
