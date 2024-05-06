@@ -5,26 +5,31 @@ using namespace std;
 #define FASTIO ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
 #define PII pair<int, int>
 
-int find(vector<vector<PII>>& graph, int cur, vector<bool>& visited) {
-	visited[cur] = true;
+int PGG;
 
+int find(vector<vector<PII>>& graph, int cur, int prv) {
 	int cnt = 0;
 	int nxt = 0;
 	for (PII p : graph[cur])
-		if (!visited[p.first]) {
+		if (p.first != prv) {
 			cnt++;
 			nxt = p.first;
 		}
-	return cnt == 1 ? find(graph, nxt, visited) : cur;
+
+	if (cnt != 1) {
+		PGG = prv;
+		return cur;
+	}
+
+	return find(graph, nxt, cur);
 }
 
-int getHeight(vector<vector<PII>>& graph, int cur, vector<bool>& visited) {
-	visited[cur] = true;
+int getHeight(vector<vector<PII>>& graph, int cur, int prv) {
 	int ret = 0;
 
-	for (PII nxt : graph[cur])
-		if(!visited[nxt.first])
-			ret = max(ret, getHeight(graph, nxt.first, visited) + nxt.second);
+	for (PII p : graph[cur])
+		if (p.first != prv)
+			ret = max(ret, getHeight(graph, p.first, cur) + p.second);
 
 	return ret;
 }
@@ -42,17 +47,15 @@ void solve() {
 		graph[v].push_back({ u,w });
 	}
 
-	//기가 노드를 찾는다
-	vector<bool> visited(N + 1);
-	int GG = find(graph, R, visited);
+	//기가 노드 찾기
+	int GG = find(graph, R, 0);
 
-	//기가부터 높이, visited 유지하는 게 핵심
-	int a = getHeight(graph, GG, visited);
+	//기가부터 높이
+	int a = getHeight(graph, GG, PGG);
 
 	//루트부터 높이
-	visited = vector<bool>(N + 1);
-	int b = getHeight(graph, R, visited);
-	
+	int b = getHeight(graph, R, 0);
+
 	cout << b - a << ' ' << a << endl;
 }
 
