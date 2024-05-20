@@ -40,10 +40,12 @@ void solve() {
 		group max_g = find_max();
 		sum += max_g.size * max_g.size;
 		erase(max_g.r, max_g.c, board[max_g.r][max_g.c]);
+
 		fall();
-		//rotate
+
 		flipLR();
 		transpose();
+
 		fall();
 
 		scan();
