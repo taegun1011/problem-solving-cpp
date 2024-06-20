@@ -2,140 +2,100 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define FASTIO ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
 #define PII pair<int, int>
+#define ll long long
 #define INF 1e9
 
-vector<string> graph(501);
-
-//다익스트라용
-vector<int> dist(250001, INF);
-vector<int> tree;
-
-//BFS용
-int visited[250001];
-
-//BFS 경로탐색용
-int path[250001];
 int N, M;
+vector<vector<int>> dist;
+int dir[4][2] = {-1, 0, 0, 1, 1, 0, 0, -1};
 
-bool inRange(int num) {
-	return 0 <= num && num < N * M;
+void bfs(queue<PII>& Q){
+    while(!Q.empty()){
+        PII p = Q.front();
+        Q.pop();
+
+        int cr = p.first, cc = p.second;
+        for (int i = 0; i < 4;i++){
+            int nr = dir[i][0] + cr, nc = dir[i][1] + cc;
+            if(nr < 0 || nr >= N || nc < 0 || nc >= M)
+                continue;
+            if(dist[nr][nc] > dist[cr][cc] + 1){
+                dist[nr][nc] = dist[cr][cc] + 1;
+                Q.push({nr, nc});
+            }
+        }
+    }
 }
 
-bool compare(PII a, PII b) {
-	if (a.first == b.first)
-		return a.second > b.second;
-	return a.first > b.first;
+int dijkstra(int sr, int sc, vector<string>& graph){
+    vector<vector<bool>> visited(N, vector<bool>(M));
+
+    int ret;
+
+    priority_queue<pair<int, PII>> pq;
+    pq.push({ret = dist[sr][sc], {sr, sc}});
+    
+    while(!pq.empty()){
+        auto p = pq.top();
+        pq.pop();
+
+        int cd = p.first, cr = p.second.first, cc = p.second.second;
+
+        if(visited[cr][cc])
+            continue;
+
+        ret = min(ret, cd);
+        if(graph[cr][cc] == 'J')
+            break;
+
+        for (int i = 0; i < 4;i++){
+            int nr = dir[i][0] + cr, nc = dir[i][1] + cc;
+            if(nr < 0 || nr >= N || nc < 0 || nc >= M || visited[nr][nc])
+                continue;
+            pq.push({dist[nr][nc], {nr, nc}});
+        }
+    }
+
+    return ret;
 }
 
-void dijkstra() {
-	//2차원을 1차원으로
-	//상하이동 : M, 좌우 이동 : 1
-	int dir[4] = { -M, 1, M, -1 };
+void solve() {
+    cin >> N >> M;
+    vector<string> graph(N);
+    dist = vector<vector<int>>(N, vector<int>(M, INF));
+    
+    for(auto& row : graph)
+        cin >> row;
 
-	//비용, 목적지
-	priority_queue<PII, vector<PII>, greater<PII>> pq;
+    queue<PII> Q;
+    int sr = 0, sc = 0, er = 0, ec = 0;
+    for (int i = 0; i < N;i++){
+        for (int j = 0; j < M;j++) {
+            if(graph[i][j] == '+'){
+                Q.push({i, j});
+                dist[i][j] = 0;
+            }
+            else if(graph[i][j] == 'V'){
+                sr = i;
+                sc = j;
+            }
+            else if(graph[i][j] == 'J'){
+                er = i;
+                ec = j;
+            }
+        }
+    }
 
-	for (int tr : tree) {
-		pq.push({ (dist[tr] = 0), tr });
-	}
-
-	int u, w;
-	while (!pq.empty()) {
-		auto t = pq.top();
-		pq.pop();
-
-		w = t.first, u = t.second;
-		if (dist[u] != w) continue;
-
-		for (int i = 0; i < 4; i++) {
-			int v = u + dir[i];
-			if (!inRange(v)) continue;
-
-			//가로 이동은 같은 줄에서만
-			if ((i == 1 && v % M == 0) || (i == 3 && v % M == M - 1)) continue;
-
-			if (dist[v] > w + 1) {
-				dist[v] = w + 1;
-				pq.push({ dist[v], v });
-			}
-		}
-	}
-}
-
-int BFS(int S, int E) {
-	int dir[4] = { -M, 1, M, -1 };
-
-	queue<int> Q;
-	Q.push(S);
-	visited[S] = 1;
-
-	int cur;
-	while (!Q.empty()) {
-		cur = Q.front();
-		Q.pop();
-
-		if (cur == E) {
-			int ret = dist[E];
-			while (cur != S) {
-				cur = path[cur];
-				ret = min(ret, dist[cur]);
-			}
-
-			return ret;
-		}
-
-		//dist값, 위치
-		vector<PII> v;
-
-		//다익스트라와 동일하게 이동
-		for (int i = 0; i < 4; i++) {
-			int next = cur + dir[i];
-
-			if (!inRange(next)) continue;
-			if ((i == 1 && next % M == 0) || (i == 3 && next % M == M - 1)) continue;
-
-			if(!visited[next])
-				v.push_back({ dist[next], next });
-		}
-
-		sort(v.begin(), v.end(), compare);
-
-		//dist값이 최대인 방향에 대해서만 BFS
-		if (!v.empty()) {
-			int mn = v[0].first;
-			for (auto p : v) {
-				if (p.first != mn) break;
-
-				int next = p.second;
-
-				visited[next] = 1;
-				path[next] = cur;
-				Q.push(next);
-			}
-		}
-	}
+    bfs(Q);
+    cout << dijkstra(sr, sc, graph) << endl;
 }
 
 int main() {
-	cin >> N >> M;
-
-	int S, E;
-	for (int i = 0; i < N; i++) {
-		cin >> graph[i];
-		//multi-source dijkstra
-		for (int j = 0; j < M; j++) {
-			int pos = i * M + j;
-			if (graph[i][j] == '+')
-				tree.push_back(pos);
-			if (graph[i][j] == 'V')
-				S = pos;
-			if (graph[i][j] == 'J')
-				E = pos;
-		}
-	}
-
-	dijkstra();
-
-	cout << BFS(S, E) << '\n';
+	FASTIO;
+	int TC = 1;
+	//cin >> TC;
+	while (TC--)
+		solve();
 }
