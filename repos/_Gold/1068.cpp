@@ -8,11 +8,11 @@ vector<vector<int>> graph;
 int N, K;
 
 int count(int root) {
-	//·çÆ®°¡ »èÁ¦µÈ Æ®¸®´Â ¹«½Ã
+	//ë£¨íŠ¸ê°€ ì‚­ì œëœ íŠ¸ë¦¬ëŠ” ë¬´ì‹œ
 	if (root == K)
 		return 0;
 
-	//¸®ÇÁ ³ëµå 1 : ÀÚ½Ä ³ëµå°¡ ¾øÀ½
+	//ë¦¬í”„ ë…¸ë“œ 1 : ìì‹ ë…¸ë“œê°€ ì—†ìŒ
 	if (!graph[root].size())
 		return 1;
 
@@ -20,7 +20,7 @@ int count(int root) {
 	for (int child : graph[root])
 		ret += count(child);
 
-	//¸®ÇÁ ³ëµå 2 : ÀÚ½ÄÀº ÀÖ´Âµ¥ K¶§¹®¿¡ ¸®ÇÁ³ëµå°¡ 0
+	//ë¦¬í”„ ë…¸ë“œ 2 : ìì‹ì€ ìˆëŠ”ë° Kë•Œë¬¸ì— ë¦¬í”„ë…¸ë“œê°€ 0
 	if (!ret)
 		ret++;
 
