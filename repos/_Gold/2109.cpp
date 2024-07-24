@@ -7,11 +7,10 @@ using namespace std;
 #define ll long long
 
 int N, M;
+bool visited[10001];
 
 void solve() {
     cin >> N;
-
-    bool visited[10001] = {0, };
 
     //가장 비싼 강의부터 마지막 날에 간다
     priority_queue<PII> pq;
