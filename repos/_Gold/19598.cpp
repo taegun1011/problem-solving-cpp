@@ -7,30 +7,30 @@ using namespace std;
 #define ll long long
 
 int N, M;
-bool visited[10001];
 
 void solve() {
     cin >> N;
+    
+    priority_queue<PII, vector<PII>, greater<PII>> pq;
 
-    //가장 비싼 강의부터 마지막 날에 간다
-    priority_queue<PII> pq;
-    int d, p;
+    int s, e, ans = 0;
     while(N--){
-        cin >> p >> d;
-        pq.push({p, d});
+        cin >> s >> e;
+        pq.push({s, 1});
+        pq.push({e, -1});
     }
 
-    int ans = 0;
+    int cnt = 0;
     while(!pq.empty()){
         auto p = pq.top();
         pq.pop();
 
-        for(int i=p.second;i>=1;i--)
-            if(!visited[i]){
-                ans+=p.first;
-                visited[i] = true;
-                break;
-            }
+        if(p.second == 1){
+            cnt++;
+            ans = max(ans, cnt);
+        }
+        else
+            cnt--;
     }
 
     cout << ans << endl;
