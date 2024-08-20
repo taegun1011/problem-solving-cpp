@@ -31,7 +31,7 @@ static char mDest[21];
 static char mSrc[21];
 static int mListValue[200000];
 
-static void generateName(char *name, int seed)
+static void generateName(char* name, int seed)
 {
     mSeed = seed;
     int name_len = pseudo_rand() % 20 + 1;
@@ -42,7 +42,7 @@ static void generateName(char *name, int seed)
     name[name_len] = '\0';
 }
 
-static int generateList(int *listValue, int seed)
+static int generateList(int* listValue, int seed)
 {
     mSeed = seed;
     int length = pseudo_rand() << 15;
@@ -119,7 +119,7 @@ static bool run()
 int main()
 {
     setbuf(stdout, NULL);
-    //freopen("sample_input.txt", "r", stdin);
+    freopen("sample_input.txt", "r", stdin);
 
     int T, MARK;
     scanf("%d %d", &T, &MARK);
