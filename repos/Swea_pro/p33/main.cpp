@@ -34,17 +34,19 @@ static int run(int score)
     scanf("%d", &Q);
 
     while (Q--)
-	{
+    {
         scanf("%d", &cmd);
 
         switch (cmd)
-		{
+        {
         case CALL_JOB:
             scanf("%d %d %d", &cTime, &mNum, &mOpt);
             res = callJob(cTime, wIDCnt, mNum, mOpt);
-			scanf("%d", &ans);
-            if (ans != res)
+            scanf("%d", &ans);
+            if (ans != res) {
+                printf("CALL_JOB wrong answer, %d %d %d %d -> res = %d, ans = %d\n", cTime, wIDCnt, mNum, mOpt, res, ans);
                 score = 0;
+            }
             wIDCnt++;
             break;
         case RETURN_JOB:
@@ -63,8 +65,10 @@ static int run(int score)
             scanf("%d %d", &cTime, &rID);
             res = check(cTime, rID);
             scanf("%d", &ans);
-            if (ans != res)
+            if (ans != res) {
+                printf("CHECK wrong answer, %d %d -> res = %d, ans = %d\n", cTime, rID, res, ans);
                 score = 0;
+            }
             break;
         default:
             score = 0;
@@ -78,7 +82,7 @@ static int run(int score)
 int main()
 {
     setbuf(stdout, NULL);
-    //freopen("sample_input.txt", "r", stdin);
+    freopen("sample_input.txt", "r", stdin);
 
     int T, score;
 

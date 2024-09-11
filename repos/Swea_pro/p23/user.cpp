@@ -19,7 +19,7 @@ void init(int mJoker, int mNumbers[5])
 
     joker = mJoker % MOD;
     for (int i = 0; i < MOD; i++)
-        for(int j = 0; j < MOD; j++)
+        for (int j = 0; j < MOD; j++)
             sum_cards[i][j] = deque<int>();
 
     for (int i = 0; i < MOD; i++) {
